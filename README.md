@@ -6,8 +6,10 @@ Instructions
 
 1. Setting up the environment
 
-	(i)	  Setup the project on your host system by typing 
+	(i)	  Setup the project on your host system by typing
+
 			git clone https://github.com/VinodKumarLogan/Aurora.git
+		  
 		  and change the directory to Aurora
 
 	(i)   Download and install VMWare Player 5.0.2 on your linux machine
@@ -25,8 +27,9 @@ Instructions
 2. Installing GUI for Ubuntu Server 12.04 LTS
 
 	(i)   Give execution permissions to avm file by typing this in your terminal 
+			
 			sudo chmod +x avm
 
 	(ii)  Run the following in your terminal
-			./avm --install-gui
 			
+			./avm --install-gui
