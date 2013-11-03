@@ -21,4 +21,7 @@ timer=0
 start=0
 stop=0
 getlogs=0
+if [$# le 2]
+    
+fi
 echo "$helpData"
