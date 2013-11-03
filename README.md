@@ -9,8 +9,7 @@ Instructions
 	(i)	  Setup the project on your host system by typing
 
 			git clone https://github.com/VinodKumarLogan/Aurora.git
-
-		  and change the directory to Aurora
+and change the directory to Aurora
 
 	(i)   Download and install VMWare Player 5.0.2 on your linux machine
 
