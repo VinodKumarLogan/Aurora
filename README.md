@@ -10,21 +10,20 @@ Instructions
 
 			git clone https://VinodKumarLogan@bitbucket.org/VinodKumarLogan/aurora.git
 
+			and change the directory to Aurora
 
-and change the directory to Aurora
+	(ii)   Download and install VMWare Workstation 9.0.2 on your linux machine
 
-	(i)   Download and install VMWare Workstation 9.0.2 on your linux machine
+	(iii)  Download and install VMWare VIX APIs for VMWare Player 5.0.x version
 
-	(ii)  Download and install VMWare VIX APIs for VMWare Player 5.0.x version
+	(iv) Download Ubuntu Server 12.04 LTS iso file
 
-	(iii) Download Ubuntu Server 12.04 LTS iso file
-
-	(iv)  Open VMWare Player (Turn off automatic updates) and create a new virtual machine
+	(v)  Open VMWare Player (Turn off automatic updates) and create a new virtual machine
 		  with the name "Aurora" having a minimum of 2GB RAM and 40GB secondary memory and 
 		  choose the Ubuntu Server12.04 LTS iso file and let the installation complete.Let 
 		  the username and password be "aurora".
 
-	(v)   Close the newly created virtual machine after the installation is complete.
+	(vi)   Close the newly created virtual machine after the installation is complete.
 
 2. Installing GUI for Ubuntu Server 12.04 LTS
 
