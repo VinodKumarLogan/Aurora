@@ -10,6 +10,7 @@ Instructions
 
 			git clone https://VinodKumarLogan@bitbucket.org/VinodKumarLogan/aurora.git
 
+			
 			and change the directory to Aurora
 
 	(ii)   Download and install VMWare Workstation 9.0.2 on your linux machine
