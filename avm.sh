@@ -1,4 +1,5 @@
 helpData=$(cat <<'END_HEREDOC'
+
 Usage: ./avm <command> <option>
 
 List of commands:-
@@ -16,6 +17,8 @@ timer <time>    Sets a timer for collecting openstack logs (time is seconds). If
 start           Starts the collection of OpenStack logs by starting its services
 stop            Stops all OpenStack services
 getlogs <path>  Transfers the logs to the given path
+------------------------------------------------------------------------------------------------
+
 END_HEREDOC
 )
 helpC=0
@@ -56,6 +59,8 @@ if [ $argCount -le 2 ] ; then
             vmrun -T ws -gu vinod -gp hawkeye createDirectoryInGuest "/home/vinod/vmware/Aurora/Aurora.vmx" "/home/vinod/Documents/Aurora"
             vmrun -T ws -gu vinod -gp hawkeye createDirectoryInGuest "/home/vinod/vmware/Aurora/Aurora.vmx" "/home/vinod/Documents/Aurora/logs"
             vmrun -T ws -gu vinod -gp hawkeye CopyFileFromHostToGuest  "/home/vinod/vmware/Aurora/Aurora.vmx" "/home/vinod/Documents/aurora/Aurora/avm.sh" "/home/vinod/Documents/Aurora/avm.sh"
+            vmrun -T ws -gu vinod -gp hawkeye CopyFileFromHostToGuest  "/home/vinod/vmware/Aurora/Aurora.vmx" "/home/vinod/Documents/aurora/Aurora/install-gui.sh" "/home/vinod/Documents/Aurora/install-gui.sh"
+            vmrun -T ws -gu vinod -gp hawkeye CopyFileFromHostToGuest  "/home/vinod/vmware/Aurora/Aurora.vmx" "/home/vinod/Documents/aurora/Aurora/install-openstack.sh" "/home/vinod/Documents/Aurora/install-openstack.sh"
         else
             echo "Too many arguments"
             echo "$helpData"
