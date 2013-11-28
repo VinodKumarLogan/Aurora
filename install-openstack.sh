@@ -1,5 +1,4 @@
-echo "hawkeye" | sudo -S apt-get -y update && echo "hackeye" | sudo -S apt-get -y dist-upgrade
-echo "hawkeye" | sudo -S apt-get -y install git-all
-mkdir /home/vinod/Documents/OpenStack && mkdir /home/vinod/Documents/OpenStack/cloudgear 
-git clone https://github.com/ilearnstack/cloudgear.git /home/vinod/Documents/OpenStack/cloudgear
-python /home/vinod/Documents/OpenStack/cloudgear/cloudgear.py
+echo "password" | sudo -S apt-get -y install git-all git-core openssh-server openssh-client &&  echo "password" | sudo -S apt-get update && echo "password" | sudo -S apt-get dist-upgrade
+mkdir /home/aurora/Documents/OpenStack && mkdir /home/aurora/Documents/OpenStack/cloudgear 
+git clone https://github.com/ilearnstack/cloudgear.git /home/aurora/Documents/OpenStack/cloudgear
+echo "password" | sudo -S python /home/aurora/Documents/OpenStack/cloudgear/cloudgear.py

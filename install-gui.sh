@@ -1,1 +1,1 @@
-echo "hawkeye" | sudo -S apt-get install ubuntu-desktop &&  echo "hawkeye" | sudo -S apt-get update && echo "hawkeye" | sudo -S apt-get dist-upgrade
+echo "password" | sudo -S apt-get -y install ubuntu-desktop git-all &&  echo "password" | sudo -S apt-get update && echo "password" | sudo -S apt-get dist-upgrade
