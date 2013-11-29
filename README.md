@@ -68,6 +68,7 @@ Instructions
 
 	(ii)   Manually
 			The Virtual machine boots up followed by starting of OpenStack services.
+			Enter the sudoer's password when prompted
 
 			./avm.sh start 
 			./avm.sh stop <path-to-save-the-logs>
