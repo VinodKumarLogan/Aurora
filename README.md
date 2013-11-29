@@ -60,7 +60,6 @@ Instructions
 6. Collecting Logs
 	
 	(i)    By setting a Timer
-
 			The Virtual machine boots up followed by starting of OpenStack services. 
 			Once the timeout is reached, the logs are transfered from the VM to the 
 			host OS. (minimum of 150 seconds)
@@ -68,7 +67,6 @@ Instructions
 			./avm.sh getlogs <path-to-save-the-logs> <seconds>
 
 	(ii)   Manually
-
 			The Virtual machine boots up followed by starting of OpenStack services.
 
 			./avm.sh getlogs <path-to-save-the-logs>
@@ -76,3 +74,9 @@ Instructions
 	To collect the logs
 
 			./avm.sh stop
+
+7. Timed Log Collection
+	
+	(i)    Run the following
+
+			./avm.sh <path-to-save-the-logs> <seconds> <count>
