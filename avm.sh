@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xv
 helpData=$(cat <<'END_HEREDOC'
 
 Usage: ./avm.sh <command> <options>
@@ -9,7 +9,8 @@ List of commands:-
 -------------------------------------------------------------------------------------------------------------
 help                            Lists all available commans=ds and options
 start                           Starts the virtual machine named Aurora at /home/username/vmware/Aurora.vmx
-stop                            Stop the OpenStack services and the virtual machine
+stop <path>                     Stop the OpenStack services and transfer the logs to the given path
+                                Note: Stops the virtual machine if path is not given
 initialize                      Copies tis script to the Guest OS and creates directories where the logs  
                                 will be stored
 installgui                      Adds GUI for the Ubuntu Server OS
@@ -45,6 +46,7 @@ if [ $argCount -le 4 ] ; then
     if [ $1 = "start" ] ; then
         if [ $argCount -eq 1 ] ; then
             vmrun -T ws start /home/${userName}/vmware/Aurora/Aurora.vmx
+            echo "Virtual Machine started successfully"
         else
             echo "Too many arguments"
             echo "$helpData"
@@ -53,12 +55,18 @@ if [ $argCount -le 4 ] ; then
     fi
     if [ $1 = "stop" ] ; then
         if [ $argCount -eq 1 ] ; then
-            if [ "$logPath" = "" ] ; then
-                echo "Path not set, execute getlogs <path> before stopping VM"
+            vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
+            echo "Virtual Machine stopped successfully"
+        fi
+        if [ $argCount -eq 2 ] ; then
+            logPath=$2
+            if ![ -d "${logPath}" ] ; then
+                echo "Invalid Path"
             else
                 vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/refreshlogs.sh"
                 sudo scp -r aurora@172.16.114.128:/home/aurora/Documents/Aurora/logs ${logPath}
                 vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
+                echo "Logs collected and Virtual Machine stopped successfully"
             fi
         else
             echo "Too many arguments"
@@ -74,6 +82,8 @@ if [ $argCount -le 4 ] ; then
             vmrun -T ws -gu aurora -gp password CopyFileFromHostToGuest  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/${userName}/Documents/aurora/Aurora/install-gui.sh" "/home/aurora/Documents/Aurora/install-gui.sh"
             vmrun -T ws -gu aurora -gp password CopyFileFromHostToGuest  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/${userName}/Documents/aurora/Aurora/install-openstack.sh" "/home/aurora/Documents/Aurora/install-openstack.sh"
             vmrun -T ws -gu aurora -gp password CopyFileFromHostToGuest  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/${userName}/Documents/aurora/Aurora/refreshlogs.sh" "/home/aurora/Documents/Aurora/refreshlogs.sh"
+            echo "Directories and Files have been initialized"
+
         else    
             echo "Too many arguments"
             echo "$helpData"
@@ -83,6 +93,7 @@ if [ $argCount -le 4 ] ; then
     if [ $1 = "installgui" ] ; then
         if [ $argCount -eq 1 ] ; then
             vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/install-openstack.sh"
+            echo "GUI Installed"
         else
             echo "Too many arguments"
             echo "$helpData"
@@ -92,6 +103,7 @@ if [ $argCount -le 4 ] ; then
     if [ $1 = "installos" ] ; then
         if [ $argCount -eq 1 ] ; then
             vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/install-openstack.sh"
+            echo "OpenStack Installed"
         else
             echo "Too many arguments"
             echo "$helpData"
@@ -99,18 +111,9 @@ if [ $argCount -le 4 ] ; then
         exit  
     fi
     if [ $1 = "getlogs" ] ; then
-        if [ $argCount -eq 1 ] ; then
+        if [ $argCount -le 2 ] ; then
             echo "Too few arguments"
             echo "$helpData"
-        fi
-        if [ $argCount -eq 2 ] ; then
-            logPath=$2
-            if [ -d "${logPath}" ] ; then
-                vmrun -T ws start /home/${userName}/vmware/Aurora/Aurora.vmx                
-            else
-                echo "Invalid Directory Path"
-                echo "$helpData"
-            fi
         fi
         if [ $argCount -eq 3 ] ; then
             logPath=$2
@@ -124,6 +127,7 @@ if [ $argCount -le 4 ] ; then
                     sudo scp -r aurora@172.16.114.128:/home/aurora/Documents/Aurora/logs ${logPath}
                     vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
                     sudo chmod -R 754 /home/${userName}/Documents/aurora/Aurora/logs
+                    echo "Logs collected and Virtual Machine stopped successfully"
                 else
                     echo "Time is not an integer"
                     echo "$helpData"
@@ -159,6 +163,7 @@ if [ $argCount -le 4 ] ; then
                             vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
                             sudo chmod -R 754 /home/${userName}/Documents/aurora/Aurora/logs
                             sleep 60
+                            echo "Logs collected and Virtual Machine stopped successfully"
                             i=`expr $i + 1`
                         done
                     else

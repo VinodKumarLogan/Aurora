@@ -69,11 +69,9 @@ Instructions
 	(ii)   Manually
 			The Virtual machine boots up followed by starting of OpenStack services.
 
-			./avm.sh getlogs <path-to-save-the-logs>
+			./avm.sh start 
+			./avm.sh stop <path-to-save-the-logs>
 
-	To collect the logs
-
-			./avm.sh stop
 
 7. Timed Log Collection
 	
