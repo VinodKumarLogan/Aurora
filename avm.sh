@@ -126,7 +126,7 @@ if [ $argCount -le 4 ] ; then
                     vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/refreshlogs.sh"
                     sudo scp -r aurora@172.16.114.128:/home/aurora/Documents/Aurora/logs ${logPath}
                     vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
-                    sudo chmod -R 754 /home/${userName}/Documents/aurora/Aurora/logs
+                    sudo chmod -R 664 /home/${userName}/Documents/aurora/Aurora/logs
                     echo "Logs collected and Virtual Machine stopped successfully"
                 else
                     echo "Time is not an integer"
@@ -161,7 +161,7 @@ if [ $argCount -le 4 ] ; then
                             mkdir dirName
                             sudo scp -r aurora@172.16.114.128:/home/aurora/Documents/Aurora/logs dirName
                             vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
-                            sudo chmod -R 754 /home/${userName}/Documents/aurora/Aurora/logs
+                            sudo chmod -R 664 /home/${userName}/Documents/aurora/Aurora/logs
                             sleep 60
                             echo "Logs collected and Virtual Machine stopped successfully"
                             i=`expr $i + 1`
