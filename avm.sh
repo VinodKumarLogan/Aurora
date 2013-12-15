@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xv
 helpData=$(cat <<'END_HEREDOC'
 
 Usage: ./avm.sh <command> <options>
@@ -61,15 +61,16 @@ if [ $argCount -le 4 ] ; then
                 exit
             fi
             logPath=$2
-            if ![ -d "${logPath}" ] ; then
+            if ! [ -d "${logPath}" ] ; then
                 echo "Invalid Path"
             else
+                ./avm.sh initialize
                 vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/refreshlogs.sh"
-                mkdir ${logPath}"glance"
-                mkdir ${logPath}"keystone"
-                mkdir ${logPath}"nova"
-                mkdir ${logPath}"rabbitmq"
-                mkdir ${logPath}"apache2"
+                mkdir ${logPath}"/glance"
+                mkdir ${logPath}"/keystone"
+                mkdir ${logPath}"/nova"
+                mkdir ${logPath}"/rabbitmq"
+                mkdir ${logPath}"/apache2"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/glance/api.log" "${logPath}/glance/api.log" 
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/glance/registry.log" "${logPath}/glance/registry.log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/keystone/keystone.log" "${logPath}/keystone/keystone.log"
@@ -80,14 +81,17 @@ if [ $argCount -le 4 ] ; then
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-consoleauth.log" "${logPath}/nova/nova-consoleauth.log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-manage.log" "${logPath}/nova/nova-manage.log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-scheduler.log" "${logPath}/nova/nova-scheduler.log"
-                vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbitmq@ubuntu.log" "${logPath}/rabbitmq/rabbitmq@ubuntu.log"
+                vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbit@ubuntu.log" "${logPath}/rabbitmq/rabbit@ubuntu.log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/shutdown_log" "${logPath}/rabbitmq/shutdown_log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/startup_log" "${logPath}/rabbitmq/startup_log"
-                vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbitmq@ubuntu-sasl.log" "${logPath}/rabbitmq/rabbitmq@ubuntu-sasl.log"
+                vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbit@ubuntu-sasl.log" "${logPath}/rabbitmq/rabbit@ubuntu-sasl.log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/access.log" "${logPath}/apache2/access.log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/error.log" "${logPath}/apache2/error.log"
                 vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/other_vhosts_access.log" "${logPath}/apache2/other_vhosts_access.log"
+                #vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/remove-logs.sh"
+                vmrun -T ws -gu aurora -gp password deleteDirectoryInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents"
                 vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
+                echo "hawkeye" | sudo -S chmod -R 777 ${logPath}
                 echo "Logs collected and Virtual Machine stopped successfully"
             fi
         else
@@ -104,8 +108,8 @@ if [ $argCount -le 4 ] ; then
             vmrun -T ws -gu aurora -gp password CopyFileFromHostToGuest  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/${userName}/Documents/aurora/Aurora/install-gui.sh" "/home/aurora/Documents/Aurora/install-gui.sh"
             vmrun -T ws -gu aurora -gp password CopyFileFromHostToGuest  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/${userName}/Documents/aurora/Aurora/install-openstack.sh" "/home/aurora/Documents/Aurora/install-openstack.sh"
             vmrun -T ws -gu aurora -gp password CopyFileFromHostToGuest  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/${userName}/Documents/aurora/Aurora/refreshlogs.sh" "/home/aurora/Documents/Aurora/refreshlogs.sh"
+            vmrun -T ws -gu aurora -gp password CopyFileFromHostToGuest  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/${userName}/Documents/aurora/Aurora/remove-logs.sh" "/home/aurora/remove-logs.sh"
             echo "Directories and Files have been initialized"
-
         else    
             echo "Too many arguments"
             echo "$helpData"
@@ -146,31 +150,31 @@ if [ $argCount -le 4 ] ; then
                     vmrun -T ws start /home/${userName}/vmware/Aurora/Aurora.vmx
                     echo "Virtual Machine started successfully"
                     sleep $((logTimer+0))
+                    mkdir ${logPath}"/glance"
+                    mkdir ${logPath}"/keystone"
+                    mkdir ${logPath}"/nova"
+                    mkdir ${logPath}"/rabbitmq"
+                    mkdir ${logPath}"/apache2"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/glance/api.log" "${logPath}/glance/api.log" 
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/glance/registry.log" "${logPath}/glance/registry.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/keystone/keystone.log" "${logPath}/keystone/keystone.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/nova/nova-api.log" "${logPath}/nova/nova-api.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/nova/nova-cert.log" "${logPath}/nova/nova-cert.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/nova/nova-compute.log" "${logPath}/nova/nova-compute.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/nova/nova-conductor.log" "${logPath}/nova/nova-conductor.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/nova/nova-consoleauth.log" "${logPath}/nova/nova-consoleauth.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/nova/nova-manage.log" "${logPath}/nova/nova-manage.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/nova/nova-scheduler.log" "${logPath}/nova/nova-scheduler.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/rabbitmq/rabbit@ubuntu.log" "${logPath}/rabbitmq/rabbit@ubuntu.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/rabbitmq/shutdown_log" "${logPath}/rabbitmq/shutdown_log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/rabbitmq/startup_log" "${logPath}/rabbitmq/startup_log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/rabbitmq/rabbit@ubuntu-sasl.log" "${logPath}/rabbitmq/rabbit@ubuntu-sasl.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/apache2/access.log" "${logPath}/apache2/access.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/apache2/error.log" "${logPath}/apache2/error.log"
+                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/var/log/apache2/other_vhosts_access.log" "${logPath}/apache2/other_vhosts_access.log"
                     vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/refreshlogs.sh"
-                    mkdir ${logPath}"glance"
-                    mkdir ${logPath}"keystone"
-                    mkdir ${logPath}"nova"
-                    mkdir ${logPath}"rabbitmq"
-                    mkdir ${logPath}"apache2"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/glance/api.log" "${logPath}/glance/api.log" 
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/glance/registry.log" "${logPath}/glance/registry.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/keystone/keystone.log" "${logPath}/keystone/keystone.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-api.log" "${logPath}/nova/nova-api.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-cert.log" "${logPath}/nova/nova-cert.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-compute.log" "${logPath}/nova/nova-compute.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-conductor.log" "${logPath}/nova/nova-conductor.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-consoleauth.log" "${logPath}/nova/nova-consoleauth.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-manage.log" "${logPath}/nova/nova-manage.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-scheduler.log" "${logPath}/nova/nova-scheduler.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbitmq@ubuntu.log" "${logPath}/rabbitmq/rabbitmq@ubuntu.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/shutdown_log" "${logPath}/rabbitmq/shutdown_log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/startup_log" "${logPath}/rabbitmq/startup_log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbitmq@ubuntu-sasl.log" "${logPath}/rabbitmq/rabbitmq@ubuntu-sasl.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/access.log" "${logPath}/apache2/access.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/error.log" "${logPath}/apache2/error.log"
-                    vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/other_vhosts_access.log" "${logPath}/apache2/other_vhosts_access.log"
                     vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
-                    sudo chmod -R 731 /home/${userName}/Documents/aurora/Aurora/logs
+                    echo "hawkeye" | sudo -S chmod -R 777 ${logPath}
                     echo "Logs collected and Virtual Machine stopped successfully"
                 else
                     echo "Time is not an integer"
@@ -198,17 +202,18 @@ if [ $argCount -le 4 ] ; then
                     if [[ $logCount =~ $re ]] ; then
                         i=1
                         while [[ i -le $logCount ]]; do
-                            dirName=${logPath}"log "$(date)
+                            dirName=${logPath}"log-"$(date +"%s")
                             vmrun -T ws start /home/${userName}/vmware/Aurora/Aurora.vmx
-                            echo "Virtual Machine started successfully"
+                            echo "Virtual Machine started successfully $i"
                             sleep $((logTimer+0))
+                            ./avm.sh initialize
                             vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/refreshlogs.sh"
-                            mkdir dirName
-                            mkdir dirName"/glance"
-                            mkdir dirName"/keystone"
-                            mkdir dirName"/nova"
-                            mkdir dirName"/rabbitmq"
-                            mkdir dirName"/apache2"
+                            mkdir ${dirName}
+                            mkdir ${dirName}"/glance"
+                            mkdir ${dirName}"/keystone"
+                            mkdir ${dirName}"/nova"
+                            mkdir ${dirName}"/rabbitmq"
+                            mkdir ${dirName}"/apache2"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/glance/api.log" "${dirName}/glance/api.log" 
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/glance/registry.log" "${dirName}/glance/registry.log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/keystone/keystone.log" "${dirName}/keystone/keystone.log"
@@ -219,17 +224,18 @@ if [ $argCount -le 4 ] ; then
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-consoleauth.log" "${dirName}/nova/nova-consoleauth.log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-manage.log" "${dirName}/nova/nova-manage.log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/nova/nova-scheduler.log" "${dirName}/nova/nova-scheduler.log"
-                            vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbitmq@ubuntu.log" "${dirName}/rabbitmq/rabbitmq@ubuntu.log"
+                            vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbit@ubuntu.log" "${dirName}/rabbitmq/rabbit@ubuntu.log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/shutdown_log" "${dirName}/rabbitmq/shutdown_log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/startup_log" "${dirName}/rabbitmq/startup_log"
-                            vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbitmq@ubuntu-sasl.log" "${dirName}/rabbitmq/rabbitmq@ubuntu-sasl.log"
+                            vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/rabbitmq/rabbit@ubuntu-sasl.log" "${dirName}/rabbitmq/rabbit@ubuntu-sasl.log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/access.log" "${dirName}/apache2/access.log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/error.log" "${dirName}/apache2/error.log"
                             vmrun -T ws -gu aurora -gp password CopyFileFromGuestToHost  "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/Documents/Aurora/logs/apache2/other_vhosts_access.log" "${dirName}/apache2/other_vhosts_access.log"
+                            vmrun -T ws -gu aurora -gp password runProgramInGuest "/home/${userName}/vmware/Aurora/Aurora.vmx" "/home/aurora/remove-logs.sh"
                             vmrun -T ws stop /home/${userName}/vmware/Aurora/Aurora.vmx
-                            sudo chmod -R 731 /home/${userName}/Documents/aurora/Aurora/logs
-                            sleep 60
+                            echo "hawkeye" | sudo -S chmod -R 777 ${dirName}
                             echo "Logs collected and Virtual Machine stopped successfully"
+                            sleep 10
                             i=`expr $i + 1`
                         done
                     else
